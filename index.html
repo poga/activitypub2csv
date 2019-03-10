@@ -1,0 +1,74 @@
+<h1>ActivityPub 轉 CSV</h1>
+
+ActivityPub 是 mastodon 系統匯出嘟文時使用的格式，這個工具能幫你把他轉成 CSV，就能用 excel 打開了。
+
+
+<h2>選擇你匯出的嘟文檔案（檔名通常是 outbox.json）</h2>
+<input type="file" />
+
+<div id="out"></div>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<script>
+      $(document).ready(function () {
+        console.log('ready')
+        $('[type=file]').change(function () {
+            $("#out").append("載入中...")
+
+            if (!("files" in this)) {
+                alert("File reading not supported in this browser");
+            }
+            var file = this.files && this.files[0];
+            if (!file) {
+                return;
+            }
+
+            var fileReader = new FileReader();
+
+            fileReader.onload = function (e) {
+              var text = e.target.result;
+
+              // json to csv
+              var csv = ''
+              csv += ['發佈時間', '原始網址', '內文'].join("\t")
+              csv += "\n"
+
+              var input = JSON.parse(text)
+              for (var i=0; i<input.orderedItems.length; i++) {
+                var item = input.orderedItems[i]
+                var row = [item.published, item.object.url, item.object.content]
+                csv += row.join("\t")
+                csv += "\n"
+              }
+              $("#out").append('<br/><a id="download" href="#">按此下載 CSV</a>')
+
+              var saveData = (function () {
+                  var a = document.createElement("a");
+                  document.body.appendChild(a);
+                  a.style = "display: none";
+                  return function (data, fileName) {
+                      var blob = new Blob([data], {type: "octet/stream"}),
+                          url = window.URL.createObjectURL(blob);
+                      a.href = url;
+                      a.download = fileName;
+                      a.click();
+                      window.URL.revokeObjectURL(url);
+                  };
+              }());
+
+              // Start file download.
+              document.getElementById("download").addEventListener("click", function(){
+                  // Generate download of hello.txt file with some content
+                  var filename = "outbox.csv";
+
+                  saveData(csv, filename);
+              }, false);
+            };
+
+            fileReader.readAsText(this.files[0]);
+
+        });
+
+    });
+</script>
