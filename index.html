@@ -2,6 +2,8 @@
 
 ActivityPub 是 mastodon 系統匯出嘟文時使用的格式，這個工具能幫你把他轉成 CSV，就能用 excel 打開了。
 
+此工具不會將你的資料上傳至任何地方，一切轉換都在你的電腦上進行，請安心使用。
+
 
 <h2>選擇你匯出的嘟文檔案（檔名通常是 outbox.json）</h2>
 <input type="file" />
@@ -12,7 +14,6 @@ ActivityPub 是 mastodon 系統匯出嘟文時使用的格式，這個工具能�
 
 <script>
       $(document).ready(function () {
-        console.log('ready')
         $('[type=file]').change(function () {
             $("#out").append("載入中...")
 
